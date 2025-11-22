@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro URL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            border: 2px solid black;
+            padding: 40px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            border-left: 6px solid black;
+            padding-left: 12px;
+            text-transform: uppercase;
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        #long-url-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid black;
+            outline: none;
+            font-size: 1rem;
+            background: #fdfdfd;
+        }
+
+        button {
+            padding: 12px;
+            background: black;
+            color: white;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            border: 2px solid black;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: white;
+            color: black;
+        }
+
+        .short-url-container {
+            padding: 12px;
+            background: #f2f2f2;
+            border: 2px solid black;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 40px;
+        }
+
+        #short-url {
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .copy-icon {
+            cursor: pointer;
+            user-select: none;
+            padding: 5px;
+            border: 2px solid black;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .copy-icon:hover {
+            background: black;
+            color: white;
+        }
+
+        .feedback {
+            font-size: 0.9rem;
+            color: green;
+            font-weight: bold;
+            margin-top: -10px;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Micro URL</h1>
+
+        <div>
+            <label for="long-url-input">Enter URL</label>
+            <input type="text" id="long-url-input" placeholder="https://example.com">
+        </div>
+
+        <button onclick="handleSubmit()">Shorten</button>
+
+        <div class="short-url-container">
+            <span id="short-url"></span>
+            <span class="copy-icon" onclick="copyUrl()">📋</span>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        async function handleSubmit() {
+            let longUrl = document.getElementById('long-url-input').value;
+            let shortUrl = document.getElementById('short-url');
+
+            let response = await fetch(`/api/shorturl`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ longUrl })
+            });
+
+            const data = await response.json();
+            shortUrl.innerHTML = data.shortUrl;
+        }
+
+        async function copyUrl() {
+            const urlText = document.getElementById('short-url').innerText;
+            const feedback = document.getElementById('feedback');
+
+            if (!urlText) return;
+
+            await navigator.clipboard.writeText(urlText);
+
+            // Show copied feedback
+            feedback.innerText = "Copied!";
+            setTimeout(() => feedback.innerText = "", 1500);
+        }
+    </script>
+
+</body>
+</html>
